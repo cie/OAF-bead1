@@ -1,0 +1,101 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bead}
+
+\def\div{\;\mathrm{div}\;}
+
+\begin{document}
+
+\fejlec {
+    \bead{1}
+    \csoport{3}
+    \datum{2010. október 5--6.}
+    \eha{KABRABI.ELTE}
+    \email{kallo.bernat@gmail.com}
+    \gyakvez{Szabóné Nacsa Rozália}
+    \feladat{3}
+    \nev{Kalló Bernát}
+    \tanar{Gregorics Tibor}
+    \targy{Objektumelvű alkalmazások fejlesztése}
+}
+
+\feladatleiras {
+    Valósítsuk meg a nagyon nagyszámok típusát! Ábrázoljuk a számokat számjegyeik
+    sorozatával, amelyet egy dinamikus helyfoglalású tömbben helyezzünk el, és
+    implementáljuk a hatékony összeadás és a szorzás műveleteit! Tegye lehetővé két
+    nagyszám típusú változó közötti értékadást!  
+}
+
+\tipus(Bignum típus) {
+    \tipusertekhalmaz {
+        A nagy számokat a tízes számrendszerbeli számjegyeik sorozatával tárolunk:
+
+            \[ Bignum = \{b \in [0..9]^n | b_n \ne 0\} \]
+
+        Az egszerűség kedvéért úgy vesszük, hogy $i>n$ esetén $a_i=0$.
+    }
+    \tipusmuveletek {
+        \muvelet{Összeadás} {
+            Két nagyszám összegét az írásbeli összeadáshoz hasonló módon végezzük.
+
+                \[A=Bignum^3 \;(a,b,c) \]
+                \[Q=(a=a' \wedge b=b') \]
+                \[R=(Q \wedge c=+(a,b))\]
+                \[+(a,b)= \left< (a_0 + b_0) \bmod 10, (a_1 + b_1 + (a_{0} + b_{0}) \div
+                10), \dots, (a_n + b_n + (a_{n-1} + b_{n-1}) \div 10)\right> \]
+
+        }
+        \muvelet{Egész számmal való szorzás} {
+            Egy nagyszámot egy (rendes) egész számmal összeszorozhatunk számjegyenként, az
+            írásbeli szorzáshoz hasonlóan:
+
+                \[A=Bignum \times \mathbb{N} \times Bignum \; (a,k,b)\]
+                \[Q=(a=a' \wedge k=k')\]
+                \[R=(Q \wedge b=*(a,k))\]
+                \[*(a,k) = \left<(a_0 \cdot k) \bmod 10, (a_1 \cdot k + (a_0 \cdot k) \div
+                10) \bmod 10, \dots,\right.\]
+                \[\left.(a_n \cdot k + (a_{n-1} \cdot k) \div 10) \bmod 10,
+                (a_{n} \cdot k) \div 10\right >\]
+        }
+        \muvelet{10-hatvánnyal való szorzás} {
+        \muvelet{Szorzás} {
+            A szorzást visszavezetjük az összeadásra
+
+
+        }
+    }
+    \reprezentacio {
+
+    }
+    \implementacio {
+        \muvelet{Összeadás} {
+
+
+
+        }
+    }
+
+
+}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# vim: lbr:tw=90:nocin:si
+

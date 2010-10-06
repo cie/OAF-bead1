@@ -1,0 +1,13 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{dsl}
+
+\typeout{DSL loaded}
+
+\def\dsl@param#1{%
+    \long\expandafter\def\csname#1\endcsname##1{%
+        \long\expandafter\def\csname p@#1\endcsname{##1}%
+    }\expandafter\def\csname p@#1\endcsname{}
+}
+
+
+% vim: ft=tex cin sw=4
