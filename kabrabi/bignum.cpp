@@ -2,6 +2,9 @@
 #include <iostream>
 
 
+/**
+ * Copy konstruktor
+ */
 Bignum::Bignum(const Bignum& other)
 {
     n = other.n;
@@ -11,6 +14,9 @@ Bignum::Bignum(const Bignum& other)
     }
 }
 
+/**
+ * Értékadás operátor
+ */
 Bignum& Bignum::operator = (const Bignum& other) {
     delete[] v;
     n = other.n;
@@ -20,10 +26,21 @@ Bignum& Bignum::operator = (const Bignum& other) {
     }
 }
 
+/**
+ * Destruktor
+ */
 Bignum::~Bignum() {
     delete[] v;
 }
 
+/**
+ * Összeadás
+ *
+ * Összead két nagyszámot.
+ * @param a az egyik szám
+ * @param b a másik szám
+ * @returns a két nagyszám összege
+ */
 Bignum operator+(const Bignum &a, const Bignum &b) {
     int maxn = a.n > b.n ? a.n : b.n;
     Bignum e;
@@ -40,6 +57,14 @@ Bignum operator+(const Bignum &a, const Bignum &b) {
     return e;
 }
 
+/**
+ * Egész számmal szorzás
+ *
+ * Megszorozza a nagyszámot egy egyjegyű egész számmal
+ * @param a a nagyszám
+ * @param x az egész szám. A [0..9] intervallumban kell lennie.
+ * @returns a szorzatuk
+ */
 
 Bignum operator*(const Bignum &a, int x) 
 {
@@ -59,6 +84,14 @@ Bignum operator*(const Bignum &a, int x)
 }
 
 
+/**
+ * Tízhatvánnyal szorzás ("shiftelés balra")
+ *
+ * Megszorozza 10^x-nel a nagyszámot.
+ * @param a a nagyszám
+ * @param x a kitevő
+ * @returns a szorzatot, vagyis a*10^x -t.
+ */
 Bignum operator<<(const Bignum &a, int x)
 {
     if (0 == a.n) return a;
@@ -78,6 +111,14 @@ Bignum operator<<(const Bignum &a, int x)
 
 
 
+/**
+ * Szorzás
+ *
+ * Összeszorozza a két nagyszámot.
+ * @param a az egyik nagyszám
+ * @param b a másik nagyszám
+ * @returns a szorzatuk
+ */
 Bignum operator*(const Bignum &a, const Bignum &b)
 {
     Bignum e("0");
@@ -89,6 +130,12 @@ Bignum operator*(const Bignum &a, const Bignum &b)
     return e;
 }
 
+/**
+ * Létrehozás sztringből
+ *
+ * Létrehozza a számot a sztringben lévő tízes számrendszerbeli alak alapján.
+ * @param s a szám tízes számrendszerben
+ */
 Bignum::Bignum(const std::string &s) {
     if (s == "0") 
     {
@@ -105,6 +152,12 @@ Bignum::Bignum(const std::string &s) {
     }
 }
 
+/**
+ * Sztringgé alakítás
+ *
+ * Sztringgé alakítja a nagyszámot
+ * @returns a tízes számrendszerbeli alakja
+ */
 Bignum::operator std::string() const {
     if (0 == n)
     {
@@ -120,6 +173,13 @@ Bignum::operator std::string() const {
     }
 }
 
+/**
+ * Beolvasás
+ *
+ * Beolvassa a nagyszámot a bemeneti adatfolyamról.
+ * @param os a bemeneti adatfolyam
+ * @param a a nagyszám
+ */
 std::istream& operator>>(std::istream& is, Bignum& a) {
     std::string s;
     is >> s;
@@ -128,7 +188,14 @@ std::istream& operator>>(std::istream& is, Bignum& a) {
 }
 
 
-std::ostream& operator<<(std::ostream& os, Bignum& a)
+/**
+ * Kiírás
+ *
+ * Kiírja a nagyszámot a megadott kimeneti adatfolyamra.
+ * @param os a kimeneti adatfolyam
+ * @param a a nagyszám
+ */
+std::ostream& operator<<(std::ostream& os, const Bignum& a)
 {
     return os << (std::string) a;
 }

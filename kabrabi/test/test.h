@@ -5,9 +5,78 @@
 #include <iostream>
 #include "../bignum.h"
 
+/**
+ * Teszteljünk-e beolvasást és kiírást (inputra vár)
+ */
+//const bool TEST_IO=true;
+const bool TEST_IO=false;
+
+/**
+ * Teszteljünk-e destruktort (lassú)
+ */
+//const bool TEST_DESTRUCTOR=true;
+const bool TEST_DESTRUCTOR=false;
+
 class Test : public CxxTest::TestSuite
 {
 public:
+
+    /**
+     * Destruktor tesztelése
+     */
+    void testDestructor() {
+        const long COUNT = 1e6L;
+        const long SLEEP = 1e4L;
+        if (TEST_DESTRUCTOR) {
+            Bignum* p;
+            std::cout << "Creating and freeing many bignums...";
+            std::cout.flush();
+            for (long i=0; i<COUNT; i++) {
+                p=new Bignum("12345678123456781234567812345678987654321345678");
+                delete p;
+                for (long j=0; j<SLEEP; j++); // sleep
+                if (i%(COUNT/10) == 0) {
+                    std::cout << (i/(COUNT/10));
+                    std::cout.flush();
+                }
+            }
+        }
+    }
+    
+    /**
+     * Copy konstruktor tesztelése
+     */
+    void testCopy() { 
+        Bignum *a = new Bignum("1234567");
+        Bignum b = *a;
+        delete a;
+        TS_ASSERT_EQUALS((std::string)b, "1234567");
+    }
+    
+    /**
+     * Értékadás tesztelése
+     */
+    void testAssignment() {
+        Bignum *a = new Bignum("1234567");
+        Bignum b("123");
+        b = *a;
+        delete a;
+        TS_ASSERT_EQUALS((std::string)b, "1234567");
+    }
+
+
+    /**
+     * Beolvasás és kiírás tesztelése
+     */
+    void testIO() {
+        if (TEST_IO) {
+            Bignum a("0");
+            std::cout << "a=";
+            std::cin >> a;
+            std::cout << "You entered " << a << std::endl;
+        }
+    }
+
     /**
      * Próba teszteset
      */
@@ -122,24 +191,6 @@ public:
         TS_ASSERT_EQUALS((std::string)(a*9), "111105");
     }
 
-    /**
-     * Copy konstruktor tesztelése
-     */
-    void testCopy() {
-        Bignum a("1234567");
-        Bignum b = a;
-        TS_ASSERT_EQUALS((std::string)b, "1234567");
-    }
-    
-    /**
-     * Értékadás tesztelése
-     */
-    void testAssignment() {
-        Bignum a("1234567");
-        Bignum b("123");
-        b = a;
-        TS_ASSERT_EQUALS((std::string)b, "1234567");
-    }
 
 };
 
