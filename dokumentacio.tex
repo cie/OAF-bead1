@@ -3,8 +3,10 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{bead}
+\usepackage{stuki}
 
 \def\div{\;\mathrm{div}\;}
+\DeclareMathOperator{\new}{new}
 
 \begin{document}
 
@@ -30,54 +32,203 @@
 
 \tipus(Bignum típus) {
     \tipusertekhalmaz {
-        A nagy számokat a tízes számrendszerbeli számjegyeik sorozatával tárolunk:
-
-            \[ Bignum = \{b \in [0..9]^n | b_n \ne 0\} \]
-
-        Az egszerűség kedvéért úgy vesszük, hogy $i>n$ esetén $a_i=0$.
+        A természetes számok.
     }
     \tipusmuveletek {
         \muvelet{Összeadás} {
-            Két nagyszám összegét az írásbeli összeadáshoz hasonló módon végezzük.
-
-                \[A=Bignum^3 \;(a,b,c) \]
-                \[Q=(a=a' \wedge b=b') \]
-                \[R=(Q \wedge c=+(a,b))\]
-                \[+(a,b)= \left< (a_0 + b_0) \bmod 10, (a_1 + b_1 + (a_{0} + b_{0}) \div
-                10), \dots, (a_n + b_n + (a_{n-1} + b_{n-1}) \div 10)\right> \]
-
+            $e:=a+b$
         }
-        \muvelet{Egész számmal való szorzás} {
-            Egy nagyszámot egy (rendes) egész számmal összeszorozhatunk számjegyenként, az
-            írásbeli szorzáshoz hasonlóan:
-
-                \[A=Bignum \times \mathbb{N} \times Bignum \; (a,k,b)\]
-                \[Q=(a=a' \wedge k=k')\]
-                \[R=(Q \wedge b=*(a,k))\]
-                \[*(a,k) = \left<(a_0 \cdot k) \bmod 10, (a_1 \cdot k + (a_0 \cdot k) \div
-                10) \bmod 10, \dots,\right.\]
-                \[\left.(a_n \cdot k + (a_{n-1} \cdot k) \div 10) \bmod 10,
-                (a_{n} \cdot k) \div 10\right >\]
-        }
-        \muvelet{10-hatvánnyal való szorzás} {
         \muvelet{Szorzás} {
-            A szorzást visszavezetjük az összeadásra
-
-
+            $e:=a*b$
+        }
+        \muvelet{Létrehozás sztringből} {
+            A tízes számrendszerbeli alakja alapján hozza létre a számot.
+        }
+        \muvelet{Sztringgé alakítás} {
+            Állítsa elő a tízes számrendszerbeli alakját.
+        }
+        \muvelet{Beolvasás} {
+            Beolvassa a szám tízes számrendszerbeli alakját.
+        }
+        \muvelet{Kiírás} {
+            Írja ki a tízes számrendszerbeli alakját.
         }
     }
     \reprezentacio {
+        Egy tömbben ($v$) tároljuk a szám tízes számrendszerbeli számjegyeit. A 0-s index
+        az egyes helyiértéknek felel meg.  Külön mezőben ($n$) tároljuk a számjegyek
+        számát. Az $n$-edik helyen nem állhat 0, ha a nullát akarjuk reprezentálni, $n=0$
+        lesz.
+
+        Például az 1234 reprezentációja $\left(n:4, v:\left<4,3,2,1\right>\right)$. A 0
+        reprezentációja $\left(n:0, v:\left<\right>\right)$.
 
     }
     \implementacio {
-        \muvelet{Összeadás} {
+        Itt a specifikációban szereplő függvényekhez hozzáveszünk még néhányat, amelyeket
+        az összeadáshoz és a szorzáshoz felhasználunk.
 
 
+        \muvelet{Egy jegy lekérdezése} {
+            Visszaadja a szám egy jegyét, vagy 0-t.
 
+            \algoritmus[5cm]{$k:=a.jegy(i)$} {
+                \begin{IF}[50]{1}{\stm{i < a.n}}
+                    \stm{k:=a.v[i]}
+                \ELSE
+                    \stm{k:=0}
+                \end{IF}
+            }
         }
+        \muvelet{Összeadás} {
+            A nagyszámokat az írásbeli összeadásnak megfelelően adjuk össze a
+            legkisebb helyiértéktől kezdve a legnagyobbig. Az eredmény leföljebb eggyel
+            lesz hosszabb, mint a hosszabbik operandus, az egyszerűség kedvéért ennyit le
+            is foglalunk a tömbnek.
+
+            \algoritmus[6.5cm]{$e:=a+b$} {
+                \stm{maxn:=\max(a.n,b.n)}
+                \stm{\new e.v[maxn+1]}
+                \stm{k:=a.jegy(0) + b.jegy(0)}
+                \stm{i:=0}
+                \begin{WHILE}{3}{\stm{i\le maxn \vee k>0}}
+                    \stm{e.v[i]:=k \bmod 10}
+                    \stm{i:=i+1}
+                    \stm{k:=k \div 10 +a.jegy(i) + b.jegy(i)}
+                \end{WHILE}
+                \stm{e.n:=i}
+            }
+        }
+        \muvelet{Egész számmal szorzás} {
+            A nagyszámokat (rendes) egész számmal az írásbeli szorzásnak megfelelően
+            szorzunk, számjegyenként a legkisebb helyiértéktől kezdve, nagyon hasonlóan az
+            összeadáshoz. Itt is megtehetjük, hogy rögtön a szám hosszánál eggyel nagyobb
+            tömböt foglalunk le, mert ennél hosszabb nem lehet a szorzat. Viszont a szám
+            hosszánál lehet rövidebb, akkor, ha a szorzó 0, ezért ezt külön meg kell
+            nézni.
+
+            \algoritmus[6.5cm]{$e:=a*x$} {
+                \begin{IF}[20]{8}{\stm{x=0}}
+                    \stm{e.n=0}
+                \ELSE
+                    \stm{\new e.v[a.n+1]}
+                    \stm{k:=a.jegy(0)*x}
+                    \stm{i:=0}
+                    \begin{WHILE}{3}{\stm{i\le a.n \vee k>0}}
+                        \stm{e.v[i]:=k \bmod 10}
+                        \stm{i:=i+1}
+                        \stm{k:=k \div 10 + a.jegy(i)*x}
+                    \end{WHILE}
+                    \stm{e.n:=i}
+                \end{IF}
+            }
+        }
+        \muvelet{Tízhatvánnyal szorzás} {
+            Egy nagyszámot tíz hatványával szorozni hatékonyabban is lehet, mint az előző
+            algoitmussal:
+
+            \algoritmus[4cm]{$e:=a*10^x$} {
+                \stm{\new e.v[a.n+x]}
+                \begin{WHILE}{1}{\stm{i:=0..x-1}}
+                    \stm{e.v[i]:=0}
+                \end{WHILE}
+                \begin{WHILE}{1}{\stm{i:=x..a.n+x-1}}
+                    \stm{e.v[i]:=a.v[i-x]}
+                \end{WHILE}
+                \stm{e.n:=a.n+x}
+            }
+        }
+
+        \muvelet{Szorzás} {
+            A szorzást vissza tudjuk vezetni a számjeggyel való szorzásra, a tízhatvánnyal
+            való szorzásra és az összeadásra, az írásbeli szorzásnak megfelelően.
+
+            \algoritmus[5cm]{$e:=a*b$} {
+                \stm{e.n:=0}
+                \begin{WHILE}{3}{\stm{i:=0..b.n-1}}
+                    \stm{p:=a*b.jegy(i)}
+                    \stm{p:=p*10^i}
+                    \stm{e:=e+p}
+                \end{WHILE}
+            }
+        }
+
+        \muvelet{Létrehozás sztringből} {
+            \algoritmus[7.6cm]{$e:=Bignum(s)$} {
+                \begin{IF}[20]{4}{\stm{s='0'}}
+                    \stm{e.n=0}
+                \ELSE
+                    \stm{e.n:=length(s)}
+                    \stm{\new e.v[e.n]}
+                    \begin{WHILE}{1}{\stm{i:=0..e.n}}
+                        \stm{e.v[i]:=ord(s[n-i-1])-ord('0')}
+                    \end{WHILE}
+                \end{IF}
+            }
+            
+        }
+        \muvelet{Sztringgé alakítás} {
+            \algoritmus[7.6cm]{$s:=String(a)$} {
+                \begin{IF}[20]{3}{\stm{e.n=0}}
+                    \stm{s:='0'}
+                \ELSE
+                    \stm{setlength(s,a.n)}
+                    \begin{WHILE}{1}{\stm{i:=0..a.n}}
+                        \stm{s[n-i-1]:=chr(a.v[i])+chr('0')}
+                    \end{WHILE}
+                \end{IF}
+            }
+        }
+        \muvelet{Beolvasás} {
+            \algoritmus[3cm]{$read(a)$} {
+                \stm{readLine(s)}
+                \stm{a:=Bignum(s)}
+            }
+        }
+        \muvelet{Kiírás} {
+            \algoritmus[3cm]{$print(a)$} {
+                \stm{print(String(a))}
+            }
+        }
+
     }
 
 
+}
+
+\megvalositas {
+    A \texttt{Bignum} osztályt a \texttt{bignum.cpp}/\texttt{bignum.h} fájlokban
+    valósítjuk meg. A műveletek nagy részét operátor-felüldefiniálással implementáljuk. A
+    további dokumentációt lásd a forráskódban.
+
+    A kódban megvalósítjuk az említetteken kívül az értékadást, a copy konstruktort,
+    ill. a destruktort.
+}
+
+\teszteles {
+    A teszteléshez a CxxTest keretrendszert használjuk. Ez a \texttt{cxxtest/} mappában található.
+    A tesztek a \texttt{test/test.h} fájlban vannak, ebből generáltuk a
+    \texttt{test/runner.cpp} fájlt, amit lefordítva kaptuk meg a \texttt{test/runner}
+    futtatható állományt. A generáláshoz és fordításhoz szükséges parancsok a Makefile-ban
+    láthatók.
+
+    \fekete {
+        \item Számok összeadása átvitel nélkül
+        \item Számok összeadása átvitellel
+        \item Nulla összeadása más számmal, nullával
+        \item Számok szorzása
+        \item Számok szorzása 1-gyel, 0-val
+        \item Nagyon nagy számok ($>2^{32}, 2^{64}$) összeadása, szorzása
+    }
+    Ezek egyben a sztring és Bignum közötti konverziókat is tesztelik.
+
+    \feher {
+        \item Szorzás kommutativitása az előző esetekben (mivel az algoritmusban nem
+        szimmetrikusan kezeltük $a$-t és $b$-t)
+        \item Szorzáshoz használt segéd metódusok tesztelése
+        \item Copy konstruktor tesztelése
+        \item Értékadás tesztelése
+    }
 }
 
 
@@ -97,5 +248,5 @@
 
 
 
-# vim: lbr:tw=90:nocin:si
+% vim: lbr:tw=90:nocin:si
 
